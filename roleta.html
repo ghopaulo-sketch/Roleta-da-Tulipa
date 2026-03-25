@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Roleta da Tulipa 🌷</title>
+
+<style>
+body{
+    background:#ffe6f0;
+    text-align:center;
+    font-family:Arial;
+}
+
+button{
+    background:#ff4da6;
+    color:white;
+    border:none;
+    padding:10px;
+    font-size:16px;
+    margin:5px;
+    cursor:pointer;
+}
+
+input{
+    padding:8px;
+    font-size:16px;
+}
+
+li{
+    font-size:18px;
+    margin:5px;
+    cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Roleta da Tulipa 🌷</h1>
+
+<input id="entrada" placeholder="Digite um nome">
+
+<button onclick="adicionar()">Adicionar</button>
+<button onclick="girar()">Girar Roleta</button>
+
+<ul id="lista"></ul>
+
+<h2 id="resultado"></h2>
+
+<script>
+
+let nomes = []
+
+//  Função reutilizável (cria item com clique)
+function criarItem(nome){
+
+    let item = document.createElement("li")
+
+    item.textContent = nome
+
+    item.onclick = function(){
+
+        let indice = nomes.indexOf(nome)
+
+        if(indice > -1){
+            nomes.splice(indice,1)
+        }
+
+        item.remove()
+
+        localStorage.setItem("nomes", JSON.stringify(nomes))
+    }
+
+    return item
+}
+
+//  Adicionar nome
+function adicionar(){
+
+    let nome = document.getElementById("entrada").value.trim()
+
+    if(nome === "") return
+
+    nomes.push(nome)
+
+    let item = criarItem(nome)
+
+    document.getElementById("lista").appendChild(item)
+
+    localStorage.setItem("nomes", JSON.stringify(nomes))
+
+    document.getElementById("entrada").value = ""
+}
+
+//  Girar roleta com animação
+function girar(){
+
+    if(nomes.length === 0){
+        return
+    }
+
+    let animacao = setInterval(function(){
+
+        let indice = Math.floor(Math.random()*nomes.length)
+        let nome = nomes[indice]
+
+        document.getElementById("resultado").textContent = nome
+
+    },100)
+
+    setTimeout(function(){
+
+        clearInterval(animacao)
+
+        let indice = Math.floor(Math.random()*nomes.length)
+        let sorteado = nomes[indice]
+
+        document.getElementById("resultado").textContent = "🎉 "+sorteado+" 🎉"
+
+        // destacar nome
+        let itens = document.querySelectorAll("li")
+
+        itens.forEach(item => item.style.color = "black")
+
+        if(itens[indice]){
+            itens[indice].style.color = "red"
+        }
+
+        // mudar cor do fundo
+        document.body.style.background = "#ffb3d9"
+
+        setTimeout(function(){
+            document.body.style.background = "#ffe6f0"
+        },1000)
+
+    },2000)
+}
+
+//  Carregar nomes salvos
+let dados = localStorage.getItem("nomes")
+
+if(dados){
+
+    nomes = JSON.parse(dados)
+
+    nomes.forEach(function(nome){
+
+        let item = criarItem(nome)
+
+        document.getElementById("lista").appendChild(item)
+
+    })
+}
+document.getElementById("entrada").addEventListener("keydown", function(event){
+
+    if(event.key === "Enter"){
+        adicionar()
+    }
+
+})
+if(event.key === "Enter"){
+    event.preventDefault()
+    adicionar()
+}
+
+</script>
+
+</body>
+
+</html>
